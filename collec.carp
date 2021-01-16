@@ -1,0 +1,44 @@
+; NB: these are not well-typed, because the most beautiful abstraction
+; (f a) -> a does not satisfy strings
+(definterface first (Fn [&a] (Maybe b)))
+(implements first Array.first)
+(implements first StaticArray.first)
+(defmodule String
+  (defn first [s]
+    (if (empty? s)
+      (Maybe.Nothing)
+      (Maybe.Just (String.head s))))
+  (implements first String.first)
+)
+
+; NB: ideally this would be (f a) -> (f a)
+(definterface rest (Fn [&a] b))
+(implements rest Array.rest)
+(implements rest StaticArray.rest)
+(implements rest String.tail)
+
+(definterface empty? (Fn [&a] Bool))
+(implements empty? Array.empty?)
+(implements empty? StaticArray.empty?)
+(implements empty? String.empty?)
+
+(definterface push (Fn [a, b] a))
+(implements push Array.push-back)
+(defmodule String
+  (defn push-back [s c]
+    (append &s &(String.from-chars &[c])))
+  (implements push String.push-back)
+)
+
+
+(doc Collec "is an abstraction over collections.")
+(defmodule Collec
+  (sig map (Fn [&(Fn [a] a) b] b))
+  (defn map [f c]
+    (let-do [new (zero)]
+      (while (not (empty? &c))
+        (do
+          (set! new (push new (~f (Maybe.unsafe-from (first &c)))))
+          (set! c (rest &c))))
+      new))
+)
