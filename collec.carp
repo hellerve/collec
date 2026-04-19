@@ -1,33 +1,33 @@
 ; NB: these are not well-typed, because the most beautiful abstraction
 ; (f a) -> a does not satisfy strings
-(definterface first (Fn [&a] (Maybe b)))
-(implements first Array.first)
-(implements first StaticArray.first)
+(definterface collec-first (Fn [&a] (Maybe b)))
+(implements collec-first Array.first)
+(implements collec-first StaticArray.first)
 (defmodule String
-  (defn first [s]
+  (defn collec-first [s]
     (if (empty? s)
       (Maybe.Nothing)
       (Maybe.Just (String.head s))))
-  (implements first String.first)
+  (implements collec-first String.collec-first)
 )
 
 ; NB: ideally this would be (f a) -> (f a)
-(definterface rest (Fn [&a] b))
-(implements rest Array.rest)
-(implements rest StaticArray.rest)
-(implements rest String.tail)
+(definterface collec-rest (Fn [&a] b))
+(implements collec-rest Array.rest)
+(implements collec-rest StaticArray.rest)
+(implements collec-rest String.tail)
 
-(definterface empty? (Fn [&a] Bool))
-(implements empty? Array.empty?)
-(implements empty? StaticArray.empty?)
-(implements empty? String.empty?)
+(definterface collec-empty? (Fn [&a] Bool))
+(implements collec-empty? Array.empty?)
+(implements collec-empty? StaticArray.empty?)
+(implements collec-empty? String.empty?)
 
-(definterface push (Fn [a, b] a))
-(implements push Array.push-back)
+(definterface collec-push (Fn [a, b] a))
+(implements collec-push Array.push-back)
 (defmodule String
-  (defn push-back [s c]
+  (defn collec-push-back [s c]
     (append &s &(String.from-chars &[c])))
-  (implements push String.push-back)
+  (implements collec-push String.collec-push-back)
 )
 
 
@@ -36,9 +36,9 @@
   (sig map (Fn [&(Fn [a] a) b] b))
   (defn map [f c]
     (let-do [new (zero)]
-      (while (not (empty? &c))
+      (while (not (collec-empty? &c))
         (do
-          (set! new (push new (~f (Maybe.unsafe-from (first &c)))))
-          (set! c (rest &c))))
+          (set! new (collec-push new (~f (Maybe.unsafe-from (collec-first &c)))))
+          (set! c (collec-rest &c))))
       new))
 )

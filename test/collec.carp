@@ -1,0 +1,17 @@
+(load "Test.carp")
+(load "../collec.carp")
+
+(use-all Test)
+
+(deftest collec_tests
+  (assert-true collec_tests
+    (=
+      &(let [f (fn [x] (+ x 1))]
+         (Collec.map &f [1 2 3]))
+      &[2 3 4])
+    "map increments all elements in arrays")
+  (assert-equal collec_tests
+    3
+    (let [f (fn [x] (+ x 1))]
+      (Array.length &(Collec.map &f [1 2 3])))
+    "map preserves collection length"))
