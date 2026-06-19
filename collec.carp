@@ -30,7 +30,6 @@
   (implements collec-push String.collec-push-back)
 )
 
-
 (doc Collec "is an abstraction over collections.")
 (defmodule Collec
   (sig map (Fn [&(Fn [a] a) b] b))
